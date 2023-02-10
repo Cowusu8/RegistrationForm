@@ -1,11 +1,16 @@
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
@@ -39,6 +44,7 @@ public class RegistrationForm implements ActionListener {
 		createWindow();// calling method from constructor
 		setLocationAndSize();
 		addComponentsToFrame();
+		actionEvent();
 	}
 
 	// Creating user-defined method
@@ -94,9 +100,61 @@ public class RegistrationForm implements ActionListener {
 		frame.add(resetButton);
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-
+	public void actionEvent() {
+		// Adding Action Listener to buttons
+		registerButton.addActionListener(this);
+		resetButton.addActionListener(this);
 	}
 
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		  if(e.getSource()==registerButton)
+	        {
+	            try {
+	                //Creating Connection Object
+	                Connection connection=DriverManager.getConnection("jdbc:mysql://localhost:3306/myDatabase","root","root");
+	                //Preapared Statement
+	                PreparedStatement Pstatement=connection.prepareStatement("insert into student values(?,?,?,?,?,?,?)");
+	                //Specifying the values of it's parameter
+	                Pstatement.setString(1,nameTextField.getText());
+	                Pstatement.setString(2,genderComboBox.getSelectedItem().toString());
+	                Pstatement.setString(3,fatherTextField.getText());
+	                Pstatement.setString(4,passwordField.getText());
+	                Pstatement.setString(5,confirmPasswordField.getText());
+	                Pstatement.setString(6,cityTextField.getText());
+	                Pstatement.setString(7,emailTextField.getText());
+	                //Checking for the Password match
+	                if(passwordField.getText().equalsIgnoreCase(confirmPasswordField.getText()))
+	                {
+	                    //Executing query
+	                    Pstatement.executeUpdate();
+	                    JOptionPane.showMessageDialog(null,"Data Registered Successfully");
+	                }
+	                else
+	                {
+	                    JOptionPane.showMessageDialog(null,"password did not match");
+	                }
+	 
+	            } catch (SQLException e1) {
+	                e1.printStackTrace();
+	            }
+	 
+	 
+	        }
+	        if(e.getSource()==resetButton)
+	        {
+	            //Clearing Fields
+	            nameTextField.setText("");
+	            genderComboBox.setSelectedItem("Male");
+	            fatherTextField.setText("");
+	            passwordField.setText("");
+	            confirmPasswordField.setText("");
+	            cityTextField.setText("");
+	            emailTextField.setText("");
+	        }
+	 
+   }
+	
+
 }
+
